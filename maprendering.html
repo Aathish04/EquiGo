@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map with Markers and Route</title>
+    <link rel="stylesheet" href="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.1/maps/maps.css" type="text/css">
+    <script type="text/javascript" src="https://api.tomtom.com/maps-sdk-for-web/cdn/6.x/6.25.1/maps/maps-web.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/@turf/turf@7.0.15/turf.min.js"></script>
+</head>
+
+<body>
+    <div id="map" style="width: 100%; height: 100vh;"></div>
+
+    <script type="text/javascript">
+        const apiKey = "cW8ALtcP9tFbFRZPOMEP8PvilgWDsiRZ";
+
+        const map = tt.map({
+            key: apiKey,
+            container: "map",
+            center: [80.254,12.99514],
+            zoom: 10
+        });
+
+        const coordinates = [[80.254, 12.99514], [80.25615, 12.99933], [80.25698, 13.00391], [80.25898, 13.00812], [80.25917, 13.01353], [80.26074, 13.0179], [80.26554, 13.01883], [80.27022, 13.02123], [80.27391, 13.02406], [80.27615, 13.02805], [80.27752, 13.03245], [80.27815, 13.03695], [80.275, 13.04071]];
+
+        coordinates.forEach(coord => {
+            new tt.Marker().setLngLat(coord).addTo(map);
+        });
+
+        const line = turf.lineString(coordinates.map(coord => [coord[1], coord[0]]));
+
+        map.addLayer({
+            'id': 'route',
+            'type': 'line',
+            'source': {
+                'type': 'geojson',
+                'data': {
+                    'type': 'Feature',
+                    'properties': {},
+                    'geometry': line
+                }
+            },
+            'paint': {
+                'line-color': 'blue',
+                'line-width': 3
+            }
+        });
+    </script>
+</body>
+
+</html>
