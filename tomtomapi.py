@@ -59,3 +59,4 @@ async def gettestdata():
           "departAt" : "null",         
           "vehicleCommercial" : "true" } 
     return jsonip
+    
