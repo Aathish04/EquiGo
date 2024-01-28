@@ -11,12 +11,11 @@ def queryWolfram(question):
     a = requests.get(ENDPOINT)
     return a.text
 
-def queries():
+def queries(PLACE="Chennai",DATE="today"):
     return  [
-        "Will it rain in PLACE on DATE?",
-        "Maximum temperature in PLACE on DATE?",
-        "Minimum temperature in PLACE on DATE?",
-        "UV index in PLACE on DATE?",
-        
+        f"Will it rain in {PLACE} on {DATE}?",
+        f"Maximum temperature in {PLACE} on {DATE}?",
+        f"Minimum temperature in {PLACE} on {DATE}?",
+        f"UV index in {PLACE} on {DATE}?",
     ]
-print(queryWolfram("Average Electric Vehicle Mileage?",))
+print(queryWolfram(queries()[3]))

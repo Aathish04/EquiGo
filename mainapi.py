@@ -9,6 +9,8 @@ import os
 import jsonllmapi
 from pathlib import Path
 
+import urllib.parse
+
 load_dotenv()
 # from tomtomapi import get_data, get_test_data, encode
 import tomtomapi
@@ -31,7 +33,7 @@ async def travelroute(start,end,departAt=None,travelMode="car",routeType="fastes
         #current time and date
         departAt = tomtomapi.convertdatetime()
     else:
-        departAt = tomtomapi.convertdatetime(departAt)
+        departAt = tomtomapi.convertdatetime()
 
     baseUrl = "https://api.tomtom.com/routing/1/calculateRoute/"
     # print(type(jsonip1["start"]))
@@ -376,15 +378,15 @@ async def planroute(request: Request):
     tofrontendjson = {}
 
     if jsonop["vehicletype"] == "ev":
-        tofrontendjson["routinginfo"]=EVroute(jsonop["startlocation"],jsonop["endlocation"])
+        tofrontendjson["routinginfo"]= await EVroute(jsonop["startlocation"],jsonop["endlocation"])
     else:
-        tofrontendjson["routinginfo"]=travelroute(jsonop["startlocation"],jsonop["endlocation"],jsonop["vehicletype"])
-    tofrontendjson["instructions"] = tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[0]
-    tofrontendjson["coordinates"] = tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[1]
+        tofrontendjson["routinginfo"]=await travelroute(jsonop["startlocation"],jsonop["endlocation"],jsonop["vehicletype"])
+    tofrontendjson["instructions"] =  tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[0]
+    tofrontendjson["coordinates"] =  tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[1]
 
-    combineinstr(tofrontendjson["instructions"])
+    combineinstr(jsonop["startlocation"],jsonop["endlocation"],tofrontendjson["instructions"])
     # Finding ETA
-    routeSummary = tofrontendjson["routinginfo"]['routes'][0]['summary']
+    routeSummary = tofrontendjson["routinginfo"]["message"]['routes'][0]['summary']
     
     # Read ETA
     tofrontendjson["eta"] = routeSummary['arrivalTime']
@@ -392,24 +394,74 @@ async def planroute(request: Request):
     # Read travel time and convert it to hours
     tofrontendjson["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
     
-    #bus travel
-    busr = travelroute(jsonop["startlocation"],jsonop["endlocation"],"bus")
-    routeSummary = busr['routes'][0]['summary']
-    tofrontendjson["bus"]["eta"]=routeSummary['arrivalTime']
-    tofrontendjson["bus"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+    # #bus travel
+    # busr = await travelroute(jsonop["startlocation"],jsonop["endlocation"],"bus")
+    # routeSummary = busr["message"]['routes'][0]['summary']
+    # tofrontendjson["bus"]={}
+    # tofrontendjson["bus"]["eta"]=routeSummary['arrivalTime']
+    # tofrontendjson["bus"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
 
-    #pedestrian
-    pedr = travelroute(jsonop["startlocation"],jsonop["endlocation"],"pedestrian")
-    routeSummary = pedr['routes'][0]['summary']
-    tofrontendjson["pedestrian"]["eta"]=routeSummary['arrivalTime']
-    tofrontendjson["pedestrian"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+    # #pedestrian
+    # pedr = await travelroute(jsonop["startlocation"],jsonop["endlocation"],"pedestrian")
+    # routeSummary = pedr["message"]['routes'][0]['summary']
+    # tofrontendjson["pedestrian"]={}
+    # tofrontendjson["pedestrian"]["eta"]=routeSummary['arrivalTime']
+    # tofrontendjson["pedestrian"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+
+    headers = {
+        'accept': 'application/json',
+        'content-type': 'application/x-www-form-urlencoded',
+    }
+    print(response)
+    data = {"user": "user", "query": response}
+    print(data)
+    response = requests.post('http://192.168.82.184:6001/', headers=headers, data=json.dumps(data))
+    print(response.text)
+    tofrontendjson["freetext"] = response.json()
     return tofrontendjson
 
 
 # Note: json_data will not be serialized by requests
 # exactly as it was in the original request.
 
-def combineinstr(instructions):
+def queryRAGLLM():
+    headers = {
+        'accept': 'application/json',
+        'content-type': 'application/x-www-form-urlencoded',
+    }
+
+    data = '{"user": "user", "query": "I need to travel from my home to Adyar quickly, and Im in a wheelchair."}'
+
+    response = requests.post(' http://192.168.82.184:6001/', headers=headers, data=data)
+    print(response)
+
+
+def queryWolfram(question):
+    query = urllib.parse.quote_plus(question)
+    print(query)
+    ENDPOINT = f"https://api.wolframalpha.com/v1/result?i={query}&appid={os.getenv('WOLFRAM_APPID')}"
+    a = requests.get(ENDPOINT)
+    return a.text
+
+
+def push_to_rag_wolfram_responses(loc="Chennai",date="today"):
+    def queries(PLACE="Chennai",DATE="today"):
+        return  [
+            f"Will it rain in {PLACE} on {DATE}?",
+            f"Maximum temperature in {PLACE} on {DATE}?",
+            f"Minimum temperature in {PLACE} on {DATE}?",
+            f"UV index in {PLACE} on {DATE}?",
+        ]
+    q = queries(loc,date)
+    for qu in q:
+        appendtorag(queryWolfram(qu))
+
+
+
+
+def combineinstr(startloc,endloc,instructions):
+    push_to_rag_wolfram_responses(startloc)
+    push_to_rag_wolfram_responses(endloc)
     t = ""
     for i in instructions:
         t = t+i
@@ -417,7 +469,21 @@ def combineinstr(instructions):
 
 def appendtorag(text):
     filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.json1"
-    f = open(filepath,"a")
-    t={}
-    t["doc"] = text
-    f.write(t)
+    with open(filepath,"a") as f:
+        t = {}
+        t["doc"] = text
+        json.dump(t,f)
+
+@app.get("/communityengagement")
+async def feedback(destination,safetyrating,disabilityrating,review):
+    s = f'The {destination} was rated {safetyrating} in terms of Safety and {disabilityrating} in terms of accessibilty for people who are differenlty abled.'
+    if review != "":
+        s = s + f'Review of {destination} : {review}'
+    appendtorag(s)
+
+
+@app.get("/fetchrag")
+async def fetchrag():
+    with open(".\llm\data\pathway-docs-small\documents.jsonl","r") as f:
+        t = f.read()
+        return t

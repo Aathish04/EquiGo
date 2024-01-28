@@ -10,10 +10,28 @@ key = os.getenv("TOMTOMAPIKEY")
 
 vehicletypes = {0:"car",1:"bus",2:"motorcycle",3:"bicycle",4:"pedestrian",5:"truck",6:"EV"}
 
+from geopy.distance import geodesic
+def filter_coordinates(coordinates, distance_threshold=500):
+    filtered_coordinates = [coordinates[0]]
+
+    for i in range(1, len(coordinates)):
+        prev_coord = filtered_coordinates[-1]
+        current_coord = coordinates[i]
+
+        # Calculate distance between consecutive coordinates
+        distance = geodesic(prev_coord, current_coord).meters
+
+        if distance >= distance_threshold:
+            filtered_coordinates.append(current_coord)
+
+    return filtered_coordinates
+
 def convertdatetime(dt=0):
-    if dt == 0:
+    if dt ==0:
         #no parameter - current datetime
         dt = datetime.now()
+    # if isinstance(dt,str):
+    #     dt=datetime.strptime(dt)
     output_date = dt.strftime("%Y-%m-%dT%H:%M:%S")
     return output_date
        
@@ -61,7 +79,8 @@ async def gettestdata():
     return jsonip
     
 def coordinatesandinstr(t):
-    # print(t["message"]["routes"][0]["guidance"]["instructions"][0])
+    
+    print(t["message"])
     inst = []
     positions = []
     for i in t["message"]["routes"][0]["guidance"]["instructions"]:
@@ -69,10 +88,14 @@ def coordinatesandinstr(t):
         positions.append(i["point"])
 
     outputlist=[]
-    for i in range(len(positions)):
-        outputlist.append([])
-        outputlist[i].append(positions[i]["longitude"])
-        outputlist[i].append(positions[i]["latitude"])
+    # print(t["message"]["routes"][0]["legs"][0].keys())
+    for i in t["message"]["routes"][0]["legs"][0]["points"]:
+        outputlist.append((i["latitude"],i["longitude"]))
+        
+        # outputlist.append((temp[i]["points"]["latitude"],temp[i]["points"]["longitude"]))
+        # outputlist[i].append(positions[i]["latitude"])
+        # outputlist[i].append(positions[i]["longitude"])
+    filter_coordinates(outputlist)
 
+    return [inst,outputlist]
 
-    return {inst,outputlist}
