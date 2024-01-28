@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EquiGo</title> <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/register.css">
+  <link rel="icon" href="/assets/EquiGo.png">
+</head>
+<body>
+  <div class="App">
+    <!-- Bootstrap Navbar -->
+    <nav id="mainNavbar" class="navbar navbar-dark navbar-expand-md py-0 fixed-top">
+        <div class="logo-image">
+            <img src="/assets/EquiGo.png" class="img-fluid">
+      </div>
+      <a href="/home" class="navbar-brand">EquiGo</a>
+      <button class="navbar-toggler" data-toggle="collapse" data-target="#navLinks" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navLinks">
+          <ul class="navbar-nav">
+              <li class="nav-item">
+                  <a href="/home" class="nav-link">HOME</a>
+              </li>
+              <li class="nav-item">
+                <a href="/" class="nav-link">Account Settings</a>
+              </li>
+              <li class="nav-item">
+                  <a href="/" class="nav-link">Enable VA</a>
+              </li>
+          </ul>
+      </div>
+  </nav>
+  <section class="vh-100">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-lg-9 col-xl-9 mt-5">
+          <div class="card text-black mt-5" style="border-radius: 25px; background-color: #ECF4D6;">
+            <div class="card-body md-5">
+              <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-9 order-2 order-lg-1">
+    <h1>Rate this location</h1>
+    <form action="/rate" method="post">
+        <label for="safetyRating">Safety Rating:</label>
+        <input type="number" class="form-control pt-3" name="safetyRating" min="1" max="5" required>
+
+        <label for="wheelchairRating">Wheelchair Accessibility Rating:</label>
+        <input type="number" class="form-control pt-3" name="wheelchairRating" min="1" max="5" required>
+        <br/>
+        <!-- Add other rating fields as needed -->
+
+        <button type="submit" class="btn btn-primary mt-3">Submit Rating</button>
+    </form>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UJ/mqcjGpWz6TGx2GpzN7ViE4HvPLOh/JvRWFBsr/DGL6NXjSicOgXl9n5ZDZ3wF" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+</body>
+</html>

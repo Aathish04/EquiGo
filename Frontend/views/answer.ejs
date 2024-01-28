@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EquiGo Answer</title>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.10.0/mapbox-gl.css" rel="stylesheet" />
+    <!-- Add your stylesheets or other dependencies here -->
+</head>
+<body>
+    <style>
+        #map {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+    
+    <!-- <h1>Answer Page</h1>
+
+    <h2>Coordinates:</h2>
+    <ul>
+        <% for (let i = 0; i < coord.length; i++) { %>
+            <li>Latitude: <%= coord[i][1] %>, Longitude: <%= coord[i][0] %></li>
+        <% } %>
+    </ul> -->
+
+    <h2>Instructions for <%= desti %>
+    </h2>
+    <ol>
+        <% for (let i = 0; i < ins.length; i++) { %>
+            <li><%= ins[i] %></li>
+        <% } %>
+    </ol>
+
+</script>
+</body>
+</html>
