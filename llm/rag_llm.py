@@ -31,6 +31,9 @@ from pathway.stdlib.ml.index import KNNIndex
 
 from llm_app.model_wrappers import SentenceTransformerTask, LiteLLMChatModel
 
+from dotenv import load_dotenv
+load_dotenv()
+
 
 class DocumentInputSchema(pw.Schema):
     doc: str
@@ -44,10 +47,10 @@ class QueryInputSchema(pw.Schema):
 def run(
     *,
     data_dir: str = os.environ.get(
-        "PATHWAY_DATA_DIR", "/Users/aathishs/Projects/AIML/EquiGo/llm/data/pathway-docs-small"
+        "PATHWAY_DATA_DIR", "llm/data/pathway-docs-small"
     ),
-    host: str = "0.0.0.0",
-    port: int = 8080,
+    host: str = os.getenv("PATHWAY_BASEURL"),
+    port: int = int(os.getenv("PATHWAY_PORT")),
     embedder_locator: str = os.environ.get("EMBEDDER", "intfloat/e5-large-v2"),
     embedding_dimension: int = 1024,
     max_tokens: int = 60,
@@ -87,8 +90,6 @@ def run(
     query_context = query + index.get_nearest_items(
         query.vector, k=3, collapse_rows=True
     ).select(documents_list=pw.this.doc)
-    with open("hello.txt","w") as f:
-        f.write(str(query_context))
 
     @pw.udf
     def build_prompt(documents, query):
