@@ -1,0 +1,5 @@
+{
+  "desti": "Mylapore",
+  "safetyRating": "2",
+  "wheelchairRating": "5"
+}
