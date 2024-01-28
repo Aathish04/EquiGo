@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EquiGo</title> <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/register.css">
+  <link rel="icon" href="/assets/EquiGo.png">
+</head>
+<body>
+  <div class="App">
+    <!-- Bootstrap Navbar -->
+    <nav id="mainNavbar" class="navbar navbar-dark navbar-expand-md py-0 fixed-top">
+        <div class="logo-image">
+            <img src="/assets/EquiGo.png" class="img-fluid">
+      </div>
+      <a href="/home" class="navbar-brand">EquiGo</a>
+      <button class="navbar-toggler" data-toggle="collapse" data-target="#navLinks" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navLinks">
+          <ul class="navbar-nav">
+              <li class="nav-item">
+                  <a href="/home" class="nav-link">HOME</a>
+              </li>
+              <li class="nav-item">
+                <a href="/" class="nav-link">Account Settings</a>
+              </li>
+              <li class="nav-item">
+                  <a href="/" class="nav-link">Enable VA</a>
+              </li>
+          </ul>
+      </div>
+  </nav>
+  <section class="vh-100">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-lg-9 col-xl-9 mt-5">
+          <div class="card text-black mt-5" style="border-radius: 25px; background-color: #ECF4D6;">
+            <div class="card-body md-5">
+              <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-9 order-2 order-lg-1">
+  
+                    <img src="/assets/bb.png" class="img-fluid mx-auto d-block">
+                          Greetings <%= userDetails.name %>!,  </br>
+                          I'm here to support your inclusive navigation. </br>
+
+What can I do for you?</br>
+
+    <!-- Form for users without vision impairment -->
+    <div id="textInputForm">
+        <input type="text" id="textInput" class="form-control pt-3" style="background-color: #9AD0C2; color: black;"><br/>
+        <button id="textSubmitButton" class="btn btn-primary w-30 mt-3 me-3 mb-3">Submit</button>
+    </div>
+
+    <div class="bottom">
+        <p id="log"></p>
+    </div>
+    <button id="viewMapButton" class="btn btn-primary mt-3">View Map</button>
+    <button id="ratingButton" class="btn btn-primary mt-3">Rate the place</button>
+
+    <script>
+        // Add an event listener to the button
+        document.getElementById('viewMapButton').addEventListener('click', function() {
+            // Redirect to map.html with coordinates as query parameters
+            window.location.href = `/map`;
+        });
+        document.getElementById('ratingButton').addEventListener('click', function() {
+            // Redirect to map.html with coordinates as query parameters
+            window.location.href = `/rate`;
+        });</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            let startButton = document.getElementById('startButton');
+            let stopButton = document.getElementById('stopButton');
+            let submitButton = document.getElementById('submitButton');
+            let textInput = document.getElementById('textInput');
+            let textSubmitButton = document.getElementById('textSubmitButton');
+            let logElement = document.getElementById('log');
+            let recordingTimeMS = 5000; // 5 seconds
+            let stream; // Declare stream variable globally
+
+            function log(msg) {
+                logElement.innerHTML += `${msg}\n`;
+            }
+
+            function wait(delayInMS) {
+                return new Promise((resolve) => setTimeout(resolve, delayInMS));
+            }
+
+            function startRecording() {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then((audioStream) => {
+                        stream = audioStream;
+                        log('Recording started...');
+                        speakText('Recording started');
+                        return startRecordingInternal(audioStream, recordingTimeMS);
+                    })
+                    .then((recordedChunks) => {
+                        let audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+                        return getBase64(audioBlob);
+                    })
+                    .then((base64String) => {
+                        log(`Successfully recorded audio`);
+                        speakText('Successfully recorded audio');
+                        textInput.value = base64String; // Set text input value with base64String
+                    })
+                    .catch((error) => {
+                        log(error.name === 'NotFoundError' ? "Microphone not found. Can't record." : error);
+                    });
+            }
+
+            function startRecordingInternal(stream, lengthInMS) {
+                let recorder = new MediaRecorder(stream);
+                let data = [];
+
+                recorder.ondataavailable = (event) => data.push(event.data);
+                recorder.start();
+                log(`${recorder.state} for ${lengthInMS / 1000} seconds…`);
+
+                let stopped = new Promise((resolve) => {
+                    recorder.onstop = resolve;
+                    recorder.onerror = (event) => resolve(); // Resolve even if there's an error
+                });
+
+                let recorded = wait(lengthInMS).then(() => {
+                    if (recorder.state === 'recording') {
+                        recorder.stop();
+                    }
+                });
+
+                return Promise.all([stopped, recorded]).then(() => data);
+            }
+
+            function stop() {
+                if (stream) {
+                    stream.getTracks().forEach((track) => track.stop());
+                    log('Recording stopped.');
+                    speakText('Recording started');
+                }
+            }
+
+
+        function speakText(message) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(message);
+            synth.speak(utterance);
+        }
+            function getBase64(blob) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = () => {
+                        const base64String = reader.result.split(',')[1];
+                        resolve(base64String);
+                    };
+                    reader.onerror = (error) => reject(error);
+                });
+            }
+            textSubmitButton.addEventListener('click', () => {
+                console.log("yessss");
+                fetch('/submit-text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ textInput: textInput.value }),
+                })
+                .then(response => response.text())
+                .then(message => {
+                    log(message);
+                })
+                .catch(error => {
+                    log(`Error submitting text data: ${error}`);
+                });
+            });
+            // Fetch the userDetails from the server
+            let userDetails = <%- JSON.stringify(userDetails) %>;
+            console.log(userDetails.isaudio);
+            if (userDetails.isaudio) {
+                startRecording();
+            }
+
+            
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UJ/mqcjGpWz6TGx2GpzN7ViE4HvPLOh/JvRWFBsr/DGL6NXjSicOgXl9n5ZDZ3wF" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EquiGo</title> <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700" rel="stylesheet">
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="/assets/register.css">
+  <link rel="icon" href="/assets/EquiGo.png">
+</head>
+<body>
+  <div class="App">
+    <!-- Bootstrap Navbar -->
+    <nav id="mainNavbar" class="navbar navbar-dark navbar-expand-md py-0 fixed-top">
+        <div class="logo-image">
+            <img src="/assets/EquiGo.png" class="img-fluid">
+      </div>
+      <a href="/home" class="navbar-brand">EquiGo</a>
+      <button class="navbar-toggler" data-toggle="collapse" data-target="#navLinks" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navLinks">
+          <ul class="navbar-nav">
+              <li class="nav-item">
+                  <a href="/home" class="nav-link">HOME</a>
+              </li>
+              <li class="nav-item">
+                <a href="/" class="nav-link">Account Settings</a>
+              </li>
+              <li class="nav-item">
+                  <a href="/" class="nav-link">Enable VA</a>
+              </li>
+          </ul>
+      </div>
+  </nav>
+  <section class="vh-100">
+    <div class="container h-100">
+      <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-lg-9 col-xl-9 mt-5">
+          <div class="card text-black mt-5" style="border-radius: 25px; background-color: #ECF4D6;">
+            <div class="card-body md-5">
+              <div class="row justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-9 order-2 order-lg-1">
+  
+                  <p class="text-center h1 fw-bold mb-2">User Information Form</p>
+  
+    <!-- Need Voice Assistance -->
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" id="isaudio">
+      <label class="form-check-label" for="isaudio">Need Voice Assistance?</label>
+    </div>
+  
+    <br>
+  
+    <!-- Language Preference -->
+    <div class="form-group">
+      <label for="language">Language Preference:</label>
+      <select class="form-control" id="language" onchange="toggleLanguage()" style="background-color: #9AD0C2; color: black;">
+        <option value="english">English</option>
+        <option value="tamil">தமிழ் (Tamil)</option>
+      </select>
+    </div>
+  
+    <!-- English Form -->
+    <div id="englishForm">
+      <form class="mx-1 mx-md-4" onsubmit="submitForm(event)">
+  
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input type="text" class="form-control" id="name" style="background-color: #9AD0C2; color: black;" required>
+        </div>
+  
+        <!-- Four-digit OTP -->
+        <div class="form-group">
+          <label for="otp">Four-digit OTP:</label>
+          <input type="text" class="form-control" id="otp" pattern="\d{4}" maxlength="4" style="background-color: #9AD0C2; color: black;" required>
+        </div>
+  
+        <!-- Vision Impairment -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="visionImpairment">
+          <label class="form-check-label" for="visionImpairment">Vision Impairment</label>
+        </div>
+  
+        <!-- Hearing Impairment -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="hearingImpairment">
+          <label class="form-check-label" for="hearingImpairment">Hearing Impairment</label>
+        </div>
+  
+        <!-- Mobility/Physical Impairment -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="mobilityPhysicalImpairment">
+          <label class="form-check-label" for="mobilityPhysicalImpairment">Mobility/Physical Impairment</label>
+        </div>
+  
+        <!-- Breathing Issues -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="breathingIssues">
+          <label class="form-check-label" for="breathingIssues">Breathing Issues</label>
+        </div>
+  
+        <!-- Dyslexia -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="dyslexia">
+          <label class="form-check-label" for="dyslexia">Dyslexia</label>
+        </div>
+  
+        <!-- Submit Button -->
+        <button class="btn btn-primary mt-3" type="submit">Submit</button>
+  
+      </form>
+    </div>
+  
+    <!-- Tamil Form -->
+    <div id="tamilForm" style="display: none;">
+      <form class="mx-1 mx-md-4" onsubmit="submitTamilForm(event)">
+  
+        <!-- பெயர் -->
+        <div class="form-group">
+          <label for="tamilName">பெயர்:</label>
+          <input type="text" class="form-control" id="tamilName" style="background-color: #9AD0C2; color: black;" required>
+        </div>
+  
+        <!-- ஓடிபி (OTP) -->
+        <div class="form-group">
+          <label for="tamilOtp">ஓடிபி (OTP):</label>
+          <input type="text" class="form-control" id="tamilOtp" style="background-color: #9AD0C2; color: black;" required>
+        </div>
+  
+        <!-- பார்வை -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="tamilVisionImpairment">
+          <label class="form-check-label" for="tamilVisionImpairment">பார்வை</label>
+        </div>
+  
+        <!-- செவித்திறன் -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="tamilHearingImpairment">
+          <label class="form-check-label" for="tamilHearingImpairment">செவித்திறன்</label>
+        </div>
+  
+        <!-- நடைபயிற்சி -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="tamilMobilityPhysicalImpairment">
+          <label class="form-check-label" for="tamilMobilityPhysicalImpairment">நடைபயிற்சி</label>
+        </div>
+  
+        <!-- சுவாச பிரச்சினைகள் -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="tamilBreathingIssues">
+          <label class="form-check-label" for="tamilBreathingIssues">சுவாச பிரச்சினைகள்</label>
+        </div>
+  
+        <!-- டிஸ்லெக்சியா -->
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="tamilDyslexia">
+          <label class="form-check-label" for="tamilDyslexia">டிஸ்லெக்சியா</label>
+        </div>
+  
+        <!-- சமர்ப்பிக்க -->
+        <button class="btn btn-primary mt-3" type="submit">சமர்ப்பிக்கவும்</button>
+  
+      </form>
+
+    <script>
+      function toggleLanguage() {
+        const language = document.getElementById('language').value;
+        document.getElementById('englishForm').style.display = language === 'english' ? 'block' : 'none';
+        document.getElementById('tamilForm').style.display = language === 'tamil' ? 'block' : 'none';
+      }
+
+      function submitForm(event) {
+        event.preventDefault();
+        const formData = {
+          name: document.getElementById('name').value,
+          otp: document.getElementById('otp').value,
+          pref_lan: 'en',
+          isaudio: document.getElementById('isaudio').checked,
+          visionImpairment: document.getElementById('visionImpairment').checked,
+          hearingImpairment: document.getElementById('hearingImpairment').checked,
+          mobilityPhysicalImpairment: document.getElementById('mobilityPhysicalImpairment').checked,
+          breathingIssues: document.getElementById('breathingIssues').checked,
+          dyslexia: document.getElementById('dyslexia').checked,
+        };
+
+        console.log('Form data submitted:', formData);
+        const formDataParams = new URLSearchParams(formData).toString();
+        const redirectUrl = `/home?${formDataParams}`;
+        window.location.href = redirectUrl;
+      }
+
+      function submitTamilForm(event) {
+        event.preventDefault();
+        const formData = {
+          name: document.getElementById('tamilName').value,
+          otp: document.getElementById('tamilOtp').value,
+          pref_lan: 'ta',
+          isaudio: document.getElementById('isaudio').checked,
+          visionImpairment: document.getElementById('tamilVisionImpairment').checked,
+          hearingImpairment: document.getElementById('tamilHearingImpairment').checked,
+          mobilityPhysicalImpairment: document.getElementById('tamilMobilityPhysicalImpairment').checked,
+          breathingIssues: document.getElementById('tamilBreathingIssues').checked,
+          dyslexia: document.getElementById('tamilDyslexia').checked,
+        };
+
+        console.log('Form data submitted:', formData);
+        const formDataParams = new URLSearchParams(formData).toString();
+        const redirectUrl = `/home?${formDataParams}`;
+        console.log('URL:', redirectUrl);
+
+        window.location.href = redirectUrl;      }
+    </script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UJ/mqcjGpWz6TGx2GpzN7ViE4HvPLOh/JvRWFBsr/DGL6NXjSicOgXl9n5ZDZ3wF" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+  </div>
+</body>
+</html>

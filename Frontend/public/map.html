@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Tile Example</title>
+</head>
+<body>
+
+<!-- Map container with an image tag -->
+<div id="map-container">
+    <img id="map-tile" alt="Map Tile">
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Replace these values with your specific parameters
+    const versionNumber = "1.0";
+    const layer = "streets";
+    const style = "default";
+    const zoom = 10;
+    const X = 256;
+    const Y = 128;
+    const format = "png";
+
+    // Construct the map tile URL
+    const imageUrl = `/map/${versionNumber}/tile/${layer}/${style}/${zoom}/${X}/${Y}.${format}`;
+
+    // Set the image source dynamically
+    const mapTileImage = document.getElementById("map-tile");
+    mapTileImage.src = imageUrl;
+});
+</script>
+
+</body>
+</html>
