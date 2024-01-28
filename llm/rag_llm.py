@@ -53,7 +53,7 @@ def run(
     port: int = int(os.getenv("PATHWAY_PORT")),
     embedder_locator: str = os.environ.get("EMBEDDER", "intfloat/e5-large-v2"),
     embedding_dimension: int = 1024,
-    max_tokens: int = 60,
+    max_tokens: int = 0,
     device: str = "cpu",
     **kwargs,
 ):
@@ -94,7 +94,7 @@ def run(
     @pw.udf
     def build_prompt(documents, query):
         docs_str = "\n".join(documents)
-        prompt = f"Given the following documents : \n {docs_str} \nanswer this query: {query}"
+        prompt = f"Given the following documents : \n {docs_str} \nOutline the route travelled and mention the temperatures throughout the day, travel advisories and precautions to take while travelling this route :{query} "
         return prompt
 
     prompt = query_context.select(
