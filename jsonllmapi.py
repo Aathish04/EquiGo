@@ -3,8 +3,9 @@ import requests
 from dotenv import load_dotenv
 load_dotenv()
 import os
-if __name__ == "__main__":
-    text = "I would like to go from adyar to mylapore."
+
+def llmgetjson(iptext):
+    text = iptext
     prompt = f"JSON of startlocation  endlocation  vehicletype  visionImpairment  mobilityPhysicalImpairment  hearingImpairment  breathingIssues  dyslexia given the following text: {text}",
     with open("llm/grammar.gbnf") as f:
         grammar = f.read()
@@ -18,4 +19,4 @@ if __name__ == "__main__":
         }
     )
     outjson = json.loads(res.json()["choices"][0]["text"])
-    
+    return outjson

@@ -6,6 +6,9 @@ from fastapi import FastAPI,Request
 from dotenv import load_dotenv
 from pprint import pprint
 import os
+import jsonllmapi
+from pathlib import Path
+
 load_dotenv()
 # from tomtomapi import get_data, get_test_data, encode
 import tomtomapi
@@ -356,7 +359,6 @@ async def planroute(request: Request):
         response = response["output"][0]["target"]
   
 
-
     elif lan != "en":
         # jsonip["data"]= unquote(jsonip["data"]);
         
@@ -367,9 +369,55 @@ async def planroute(request: Request):
     
     else:
         response = jsonip["data"]
-
+    #at this poit response will always be a single english string
     #send this response to llm and receive a json
-    return response
+    jsonop = jsonllmapi.llmgetjson(response)
+
+    tofrontendjson = {}
+
+    if jsonop["vehicletype"] == "ev":
+        tofrontendjson["routinginfo"]=EVroute(jsonop["startlocation"],jsonop["endlocation"])
+    else:
+        tofrontendjson["routinginfo"]=travelroute(jsonop["startlocation"],jsonop["endlocation"],jsonop["vehicletype"])
+    tofrontendjson["instructions"] = tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[0]
+    tofrontendjson["coordinates"] = tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[1]
+
+    combineinstr(tofrontendjson["instructions"])
+    # Finding ETA
+    routeSummary = tofrontendjson["routinginfo"]['routes'][0]['summary']
+    
+    # Read ETA
+    tofrontendjson["eta"] = routeSummary['arrivalTime']
+ 
+    # Read travel time and convert it to hours
+    tofrontendjson["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+    
+    #bus travel
+    busr = travelroute(jsonop["startlocation"],jsonop["endlocation"],"bus")
+    routeSummary = busr['routes'][0]['summary']
+    tofrontendjson["bus"]["eta"]=routeSummary['arrivalTime']
+    tofrontendjson["bus"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+
+    #pedestrian
+    pedr = travelroute(jsonop["startlocation"],jsonop["endlocation"],"pedestrian")
+    routeSummary = pedr['routes'][0]['summary']
+    tofrontendjson["pedestrian"]["eta"]=routeSummary['arrivalTime']
+    tofrontendjson["pedestrian"]["travelTime"] = routeSummary['travelTimeInSeconds'] / 3600
+    return tofrontendjson
+
 
 # Note: json_data will not be serialized by requests
 # exactly as it was in the original request.
+
+def combineinstr(instructions):
+    t = ""
+    for i in instructions:
+        t = t+i
+    appendtorag(t)
+
+def appendtorag(text):
+    filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.json1"
+    f = open(filepath,"a")
+    t={}
+    t["doc"] = text
+    f.write(t)

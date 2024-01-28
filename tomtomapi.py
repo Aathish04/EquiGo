@@ -76,4 +76,3 @@ def coordinatesandinstr(t):
 
 
     return {inst,outputlist}
-        
