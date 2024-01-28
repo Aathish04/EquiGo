@@ -123,7 +123,7 @@ async def EVroute(start,end):
     locations = "lat,long:lat,long"
     locations = start+ ":" + end
     response = requests.post(
-        f'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/{locations}/json?key=qN86js1EGFaSWvQ28TASgkUuphaxAnbF&vehicleEngineType=electric&constantSpeedConsumptionInkWhPerHundredkm=32,10.87:77,18.01&currentChargeInkWh=20&maxChargeInkWh=40&minChargeAtDestinationInkWh=4&minChargeAtChargingStopsInkWh=4',
+        f'https://api.tomtom.com/routing/1/calculateLongDistanceEVRoute/{locations}/json?key=qN86js1EGFaSWvQ28TASgkUuphaxAnbF&vehicleEngineType=electric&constantSpeedConsumptionInkWhPerHundredkm=32,10.87:77,18.01&currentChargeInkWh=20&maxChargeInkWh=40&minChargeAtDestinationInkWh=4&minChargeAtChargingStopsInkWh=4&instructionsType=text',
         headers=headers,
         json=json_data,
     )
@@ -303,7 +303,7 @@ async def planroute(request: Request):
     data = jsonip["data"]
     response = jsonip["data"]
     # input()
-    if isaudio== True :
+    if isaudio != False :
         print("#################################")
         headers = {
         'authority': 'demo-api.models.ai4bharat.org',
@@ -345,6 +345,17 @@ async def planroute(request: Request):
         }
 
         response = requests.post('https://demo-api.models.ai4bharat.org/inference/asr/conformer', headers=headers, json=json_data)
+        response = response.json()["output"][0]["source"]
+        print(response)
+        translate_dict = {"pref_lan":lan, "data":response}
+        #translate the transcribed indic language text
+        translate_dict = json.dumps(translate_dict)
+        response = await preftoen(translate_dict)
+        
+        print(response)
+        response = response["output"][0]["target"]
+  
+
 
     elif lan != "en":
         # jsonip["data"]= unquote(jsonip["data"]);
@@ -352,13 +363,13 @@ async def planroute(request: Request):
         # print(jsonip)
         response = await preftoen(json.dumps(jsonip))
         print(response)
-        return response["output"][0]["target"]
+        response = response["output"][0]["target"]
     
     else:
         response = jsonip["data"]
-    if (isinstance(response,str)):
-        return response
-    return response.json()
+
+    #send this response to llm and receive a json
+    return response
 
 # Note: json_data will not be serialized by requests
 # exactly as it was in the original request.

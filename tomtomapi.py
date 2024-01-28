@@ -60,3 +60,20 @@ async def gettestdata():
           "vehicleCommercial" : "true" } 
     return jsonip
     
+def coordinatesandinstr(t):
+    # print(t["message"]["routes"][0]["guidance"]["instructions"][0])
+    inst = []
+    positions = []
+    for i in t["message"]["routes"][0]["guidance"]["instructions"]:
+        inst.append(i["message"])
+        positions.append(i["point"])
+
+    outputlist=[]
+    for i in range(len(positions)):
+        outputlist.append([])
+        outputlist[i].append(positions[i]["longitude"])
+        outputlist[i].append(positions[i]["latitude"])
+
+
+    return {inst,outputlist}
+        
