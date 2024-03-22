@@ -10,7 +10,7 @@ if __name__ == "__main__":
         grammar = f.read()
 
     res = requests.post(
-        url=os.getenv("LLMAPI_BASEURL")+"/completions",
+        url="http://0.0.0.0:8000/v1"+"/completions",
         json={
         "prompt" : prompt,
         "grammar" : grammar,
@@ -18,4 +18,4 @@ if __name__ == "__main__":
         }
     )
     outjson = json.loads(res.json()["choices"][0]["text"])
-    
+    print(outjson)

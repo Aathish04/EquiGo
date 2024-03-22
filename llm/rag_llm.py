@@ -106,7 +106,7 @@ def run(
     responses = prompt.select(
         query_id=pw.this.id,
         result=model.apply(
-            pw.this.prompt, max_tokens=max_tokens, custom_llm_provider="custom_openai",base_url=os.getenv("LLMAPI_BASEURL")
+            pw.this.prompt, max_tokens=max_tokens, custom_llm_provider="custom_openai",base_url="http://0.0.0.0:8000/v1",locator="custom_openai"
         ),
     )
 
