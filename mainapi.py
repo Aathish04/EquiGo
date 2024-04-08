@@ -468,7 +468,7 @@ def combineinstr(startloc,endloc,instructions):
     appendtorag(t)
 
 def appendtorag(text):
-    filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.json1"
+    filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.jsonl"
     with open(filepath,"a") as f:
         t = {}
         t["doc"] = text

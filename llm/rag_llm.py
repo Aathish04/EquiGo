@@ -46,11 +46,9 @@ class QueryInputSchema(pw.Schema):
 
 def run(
     *,
-    data_dir: str = os.environ.get(
-        "PATHWAY_DATA_DIR", "llm/data/pathway-docs-small"
-    ),
+    data_dir: str = "/Users/aathishs/Projects/EquiGo/llm/data/pathway-docs-small/documents.jsonl",
     host: str = os.getenv("PATHWAY_BASEURL"),
-    port: int = int(os.getenv("PATHWAY_PORT")),
+    port: int = 6001,
     embedder_locator: str = os.environ.get("EMBEDDER", "intfloat/e5-large-v2"),
     embedding_dimension: int = 1024,
     max_tokens: int = 0,
