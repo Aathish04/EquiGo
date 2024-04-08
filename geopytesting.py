@@ -1,5 +1,5 @@
 from geopy.distance import geodesic
-t = {
+# t = {
     "message": {
         "formatVersion": "0.0.12",
         "routes": [
@@ -1343,7 +1343,7 @@ t = {
         ]
     }
 }
-def filter_coordinates(coordinates, distance_threshold=500):
+def filter_coordinates(coordinates, distance_threshold=3000):
     filtered_coordinates = [coordinates[0]]
 
     for i in range(1, len(coordinates)):
@@ -1374,9 +1374,21 @@ def coordinatesandinstr(t):
         # outputlist.append((temp[i]["points"]["latitude"],temp[i]["points"]["longitude"]))
         # outputlist[i].append(positions[i]["latitude"])
         # outputlist[i].append(positions[i]["longitude"])
-    filter_coordinates(outputlist)
+    # filter_coordinates(outputlist)
+    pick_uniform_elements(outputlist, 20)
 
     return [inst,outputlist]
 
-for i in coordinatesandinstr(t)[1]:
-    print(i)
+# for i in coordinatesandinstr(t)[1]:
+#     print(i)
+
+
+import numpy as np
+
+def pick_uniform_elements(array, num_elements):
+    step_size = len(array) // num_elements
+    print("&&&&")
+    
+    print(array[::step_size][:num_elements],"\n***\n*",len(array[::step_size][:num_elements]))
+    print("&&&&&&&&&&&&")
+    return array[::step_size][:num_elements]

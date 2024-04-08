@@ -77,6 +77,14 @@ async def gettestdata():
           "departAt" : "null",         
           "vehicleCommercial" : "true" } 
     return jsonip
+
+def pick_uniform_elements(array, num_elements):
+    step_size = len(array) // num_elements
+    print("&&&&")
+    
+    print(array[::step_size][:num_elements],"\n***\n*",len(array[::step_size][:num_elements]))
+    print("&&&&&&&&&&&&")
+    return array[::step_size][:num_elements]
     
 def coordinatesandinstr(t):
     
@@ -95,7 +103,7 @@ def coordinatesandinstr(t):
         # outputlist.append((temp[i]["points"]["latitude"],temp[i]["points"]["longitude"]))
         # outputlist[i].append(positions[i]["latitude"])
         # outputlist[i].append(positions[i]["longitude"])
-    filter_coordinates(outputlist)
+    pick_uniform_elements(outputlist,20)
 
     return [inst,outputlist]
 

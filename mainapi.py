@@ -1,4 +1,5 @@
 import json
+import time
 import requests
 import urllib.parse as urlparse
 from urllib.parse import unquote
@@ -137,7 +138,10 @@ async def EVroute(start,end):
 @app.get("/entopref")
 async def entopref(jsonip):
     jsonip = json.loads(jsonip)
-    lan = jsonip["pref_lan"]
+    if jsonip["pref_lan"] :
+        lan = jsonip["pref_lan"]   
+    else:
+        lan = "en" 
     text = jsonip["text"]
 
     headers = {
@@ -308,7 +312,7 @@ async def planroute(request: Request):
     data = jsonip["data"]
     response = jsonip["data"]
     # input()
-    if isaudio != False :
+    if isaudio != "false" :
         print("#################################")
         headers = {
         'authority': 'demo-api.models.ai4bharat.org',
@@ -373,7 +377,9 @@ async def planroute(request: Request):
         response = jsonip["data"]
     #at this poit response will always be a single english string
     #send this response to llm and receive a json
+        
     jsonop = jsonllmapi.llmgetjson(response)
+    print(jsonop)
 
     tofrontendjson = {}
 
@@ -383,7 +389,9 @@ async def planroute(request: Request):
         tofrontendjson["routinginfo"]=await travelroute(jsonop["startlocation"],jsonop["endlocation"],jsonop["vehicletype"])
     tofrontendjson["instructions"] =  tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[0]
     tofrontendjson["coordinates"] =  tomtomapi.coordinatesandinstr(tofrontendjson["routinginfo"])[1]
-
+    # print(len(tofrontendjson["coordinates"]))
+    tofrontendjson["coordinates"]=tomtomapi.pick_uniform_elements(tofrontendjson["coordinates"],20)
+    print(len(tofrontendjson["coordinates"]))
     combineinstr(jsonop["startlocation"],jsonop["endlocation"],tofrontendjson["instructions"])
     # Finding ETA
     routeSummary = tofrontendjson["routinginfo"]["message"]['routes'][0]['summary']
@@ -412,28 +420,32 @@ async def planroute(request: Request):
         'accept': 'application/json',
         'content-type': 'application/x-www-form-urlencoded',
     }
-    print(response)
+    
     data = {"user": "user", "query": response}
     print(data)
-    response = requests.post('http://192.168.82.184:6001/', headers=headers, data=json.dumps(data))
+    time.sleep(5)
+    # LLM - RAG CALL
+    response = requests.post('http://192.168.175.184:6001/', headers=headers, data=json.dumps(data))
+    tofrontendjson["destination"] = jsonop["endlocation"]
     print(response.text)
     tofrontendjson["freetext"] = response.json()
+    # print("Coordinates : ",tofrontendjson["coordinates"],"************")
     return tofrontendjson
 
 
 # Note: json_data will not be serialized by requests
 # exactly as it was in the original request.
 
-def queryRAGLLM():
-    headers = {
-        'accept': 'application/json',
-        'content-type': 'application/x-www-form-urlencoded',
-    }
+# def queryRAGLLM():
+#     headers = {
+#         'accept': 'application/json',
+#         'content-type': 'application/x-www-form-urlencoded',
+#     }
 
-    data = '{"user": "user", "query": "I need to travel from my home to Adyar quickly, and Im in a wheelchair."}'
+#     # data = '{"user": "user", "query": "I need to travel from my home to Adyar quickly, and Im in a wheelchair."}'
 
-    response = requests.post(' http://192.168.82.184:6001/', headers=headers, data=data)
-    print(response)
+#     response = requests.post('http://192.168.175.184:8000/', headers=headers, data=data)
+#     print(response)
 
 
 def queryWolfram(question):
@@ -468,11 +480,12 @@ def combineinstr(startloc,endloc,instructions):
     appendtorag(t)
 
 def appendtorag(text):
-    filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.json1"
+    filepath = Path("llm")/"data"/"pathway-docs-small"/"documents.jsonl"
     with open(filepath,"a") as f:
         t = {}
         t["doc"] = text
         json.dump(t,f)
+        f.write("\n")
 
 @app.get("/communityengagement")
 async def feedback(destination,safetyrating,disabilityrating,review):

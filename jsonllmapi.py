@@ -11,7 +11,7 @@ def llmgetjson(iptext):
         grammar = f.read()
 
     res = requests.post(
-        url=os.getenv("LLMAPI_BASEURL")+"/completions",
+        url="http://192.168.175.184:8000/v1"+"/completions",
         json={
         "prompt" : prompt,
         "grammar" : grammar,
